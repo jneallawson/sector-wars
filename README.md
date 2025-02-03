@@ -1,5 +1,7 @@
 # sector-wars
 
+Currently, this is just a PIXI.js v8 template for typescript using bun.
+
 To install dependencies:
 
 ```bash
