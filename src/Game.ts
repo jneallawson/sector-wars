@@ -1,19 +1,33 @@
 import * as PIXI from 'pixi.js';
+import { Container } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 
 export class Game {
     private app: PIXI.Application;
     private viewport!: Viewport;
+    private worldContainer: PIXI.Container; // For game objects that move with viewport
+    private uiContainer: PIXI.Container;    // For fixed UI elements
     private readonly WORLD_SIZE = 100000; // 100,000 meters
 
     constructor() {
         // Create the PIXI application
         this.app = new PIXI.Application();
         this.initialize();
+
+        // Add game objects to the worldContainer. This container will move
+        // with the viewport.
+        this.worldContainer = new PIXI.Container();
+        this.viewport.addChild(this.worldContainer);
+
+        // Add UI elements to the uiContainer. This container is added
+        // directly to stag and bypasses the world-coordinates of the viewport.
+        this.uiContainer = new PIXI.Container();
+        this.app.stage.addChild(this.uiContainer);
     }
 
+    // Initialize the PIXI application - version 8 moves initialization to a
+    // separate, asynchronous method, app.init().
     async initialize() {
-        // Initialize the PIXI application
         await this.app.init({
             background: '#000000',
             width: window.innerWidth,
@@ -56,6 +70,22 @@ export class Game {
         
         // Handle fullscreen changes
         document.addEventListener('fullscreenchange', this.onResize.bind(this));
+    }
+
+    public worldAdd(object: Container): void { 
+        this.worldContainer.addChild(object);
+    }
+
+    public worldRemove(object: Container): void {
+        this.worldContainer.removeChild(object);
+    }
+
+    public uiAdd(object: Container): void {
+        this.uiContainer.addChild(object);
+    }
+
+    public uiRemove(object: Container): void {
+        this.uiContainer.removeChild(object);
     }
 
     private onResize(): void {
